@@ -1,11 +1,11 @@
 import bcryptjs from 'bcryptjs';
-import User from '../models/user.model.js'; // Assuming you have a User model
+import User from '../models/user.model.js'; 
 
 export const signup = async (req, res) => {
     try {
         const { username, fullname, email, password } = req.body;
 
-        // Check if required fields are missing
+        
         if (!username || !fullname || !email || !password) {
             return res.status(400).json({ error: "All fields are required" });
         }
