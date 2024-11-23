@@ -12,3 +12,5 @@ const gentrateToken = (userId,res)=>{
     })
 
 }
+
+export default gentrateToken;
