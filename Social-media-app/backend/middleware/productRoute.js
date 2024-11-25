@@ -1,35 +1,34 @@
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 
-const protuctRoute= async (req,res,next)=>{
+const productRoute = async (req, res, next) => {
     try {
-
-
         const token = req.cookies.jwt;
-        if(!token){
-            return res.status(400).json({error:"unauthorized : no token provider"})
+        if (!token) {
+            return res.status(400).json({ error: "unauthorized: no token provided" });
+        }
+        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        if (!decoded) {
+            return res.status(400).json({ error: "unauthorized: invalid token" });
         }
 
-        const decode= jwt.verify(token,process.env.JWT_SECRET)
+        // Await the user lookup to ensure you get the actual user document
+        const user = await User.findOne({ _id: decoded.userId }).select("-password");
 
-        if(!decode){
-            return res.status(400).json({error:"unauthorized : invalid token"})
+        if (!user) {
+            return res.status(400).json({ error: "user not found" });
         }
-     const user = User.findOne({_id: decode.userId}).select("-password")
 
-     if(!user){
-        return res.status(400).json({error:"user not found"})
-    }
-
-    req.user =user;-
-    next()
+        // Attach the user to the request object
+        req.user = user;
+        next();
 
     } catch (error) {
-
-        console.log(`error in product Route middle ware${error}`)
-        res.status(500).json({error:"internal server Error"})
-        
+        console.log(`Error in product route middleware: ${error}`);
+        res.status(500).json({ error: "internal server error" });
     }
-    
-}
-export default protuctRoute;
+};
+
+export default productRoute;
