@@ -10,6 +10,8 @@ import postsRoute from "./routes/posts.route.js"
 import notificationRoute from "./routes/notification.route.js"
 // import databace connection
 import connectDB from "./db/connecDB.js";
+//connect port frontend
+import cors from "cors"
 
 // confic files
   //dotenv
@@ -24,9 +26,17 @@ cloudinary.config({
 // insulation variables
 const app = express();
 const PORT= process.env.PORT;
+
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true
+}))
   
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({
+    extended:true
+}))
 
 // routes path
 app.use("/api/auth", authRoute)

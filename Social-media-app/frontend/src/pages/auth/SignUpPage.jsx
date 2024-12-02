@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Logo from "../components/Logo";
+import Logo from "../../components/Logo";
+import { useMutation } from "@tanstack/react-query"; 
 import { MdOutlineMail, MdPassword, MdDriveFileRenameOutline } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
+import {baseURL} from "../../constant/url.js"
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -11,34 +13,37 @@ const SignUpPage = () => {
     fullName: "",
     password: "",
   });
+  const {mutate,isPending,isError,error}= useMutation({
+    mutationFn: async({email,username,fullName,password})=>{
+      try {
+        const res = await fetch(`${baseURL}/api/auth/signup`,{
+          method:"post",
+          credentials:"include",
+          headers:{
+            "Content-Type":"application/json",
+            "Accept":"application/json"
+          },
+          body:JSON.stringify({email,fullName,username,password})
+        })
+        const data = await  res.json();
 
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+        if(!res.ok){
+throw new Error(data.error||"something went wrong")
+        }
+      } catch (error) {
+        console.log(error)
+        
+      }
+    },
+    onSuccess :()=>{
+      console.log("user created")
+    }
+  })
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // page won't reload
-    setIsLoading(true);
-
-    // Simple validation
-    if (!formData.email || !formData.username || !formData.password) {
-      setIsError(true);
-      setIsLoading(false);
-      return;
-    }
-
-    console.log(formData);
-    // Simulate API call
-    try {
-      // Simulating a delay for API call
-      setTimeout(() => {
-        setIsLoading(false);
-        alert("Form submitted successfully!");
-        // You can reset the form or redirect the user after success
-      }, 1500);
-    } catch (error) {
-      setIsError(true);
-      setIsLoading(false);
-    }
+    mutate(formData)
+    
   };
 
   const handleInputChange = (e) => {
@@ -100,16 +105,16 @@ const SignUpPage = () => {
               value={formData.password}
             />
           </label>
-          <button className="btn rounded-full btn-primary text-white" disabled={isLoading}>
-            {isLoading ? "Signing Up..." : "Sign Up"}
+          <button className="btn rounded-full btn-primary text-white" >
+            {isPending ? "Loading" : "Sign Up"}
           </button>
-          {isError && <p className="text-red-500">Something went wrong. Please try again.</p>}
+          {isError && <p className="text-red-500">{error.message}</p>}
         </form>
         <div className="flex flex-col lg:w-2/3 gap-2 mt-4">
           <p className="text-white text-lg">Already have an account?</p>
           <Link to="/login">
             <button className="btn rounded-full btn-primary text-white btn-outline w-full">
-              Sign in
+              LogIn 
             </button>
           </Link>
         </div>
