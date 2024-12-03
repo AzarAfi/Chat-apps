@@ -5,6 +5,7 @@ import LogInPage from "./pages/auth/LogInPage.jsx";
 import Sidebar from "./components/common/Sidebar.jsx";
 import RightPanel from "./components/common/RightPanal.jsx";
 import NotificationPage from "./pages/notification/NotificationPage.jsx";
+import {Toaster} from "react-hot-toast"
 
 function App() {
   return (
@@ -19,10 +20,8 @@ function App() {
         <Route path="/login" element={<LogInPage />} />
         <Route path="/notification" element={<NotificationPage/>} />
       </Routes>
-
     <RightPanel/>
-
-    
+    <Toaster/>
     </div>
   );
 }

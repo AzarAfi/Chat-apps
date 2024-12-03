@@ -2,19 +2,47 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../../components/Logo";
 import { MdOutlineMail, MdPassword } from "react-icons/md";
+import { useMutation } from "@tanstack/react-query";
+import { baseURL } from "../../constant/url";
 
 
-const LogInPage = () => {
+const LogInPage = () => { 
   const [formData, setFormData] = useState({
     username: "",
     password: "",
+  });
+  const { mutate, isPending, isError, error } = useMutation({
+    mutationFn: async ({  username, password }) => {
+      try {
+        const res = await fetch(`${baseURL}/api/auth/login`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: JSON.stringify({username, password }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Something went wrong");
+        }
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      console.log("Log in sucees");
+    },
   });
 
  
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    mutate(formData)
   };
 
   const handleInputChange = (e) => {
@@ -61,11 +89,11 @@ const LogInPage = () => {
 
           {/* Submit Button */}
           <button className="btn rounded-full btn-primary text-white">
-            Login 
+          {isPending ? "Loading..." : "LogIn"}
           </button>
 
           {/* Error Message */}
-          <p className="text-red-500">you dont have account</p>
+          {isError && <p className="text-red-500">{error.message || "An error occurred"}</p>}
         </form>
 
         {/* Sign-up Redirect */}

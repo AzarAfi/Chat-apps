@@ -25,13 +25,15 @@ cloudinary.config({
 
 // insulation variables
 const app = express();
-const PORT= process.env.PORT;
-
-app.use(cors({
-    origin:"http://localhost:5173",
-    credentials:true
-}))
+const corsOptions = {
+    origin: 'http://localhost:5173', // Replace with the frontend URL
+    credentials: true, // Allow cookies to be sent
+  };
+  app.use(cors(corsOptions));
   
+
+
+const PORT= process.env.PORT; 
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({
