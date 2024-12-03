@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../../components/Logo";
-import { MdOutlineMail, MdPassword } from "react-icons/md";
-import { useMutation } from "@tanstack/react-query";
+import { FaUser } from "react-icons/fa";
+import {  MdPassword } from "react-icons/md";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { baseURL } from "../../constant/url";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 
 const LogInPage = () => { 
@@ -11,7 +14,8 @@ const LogInPage = () => {
     username: "",
     password: "",
   });
-  const { mutate, isPending, isError, error } = useMutation({
+  const queryClient = useQueryClient()
+  const { mutate:logIn, isPending, isError, error } = useMutation({
     mutationFn: async ({  username, password }) => {
       try {
         const res = await fetch(`${baseURL}/api/auth/login`, {
@@ -34,7 +38,14 @@ const LogInPage = () => {
       }
     },
     onSuccess: () => {
-      console.log("Log in sucees");
+      toast.success("login successfully")
+
+      // rediract the home page
+      queryClient.invalidateQueries(
+        {
+          queryKey:["authUser"]
+        }
+      )
     },
   });
 
@@ -42,7 +53,7 @@ const LogInPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutate(formData)
+    logIn(formData)
   };
 
   const handleInputChange = (e) => {
@@ -61,7 +72,7 @@ const LogInPage = () => {
 
           {/* Username Field */}
           <label className="input input-bordered rounded flex items-center gap-2">
-            <MdOutlineMail />
+          <FaUser />
             <input
               type="text"
               className="grow"
@@ -89,7 +100,7 @@ const LogInPage = () => {
 
           {/* Submit Button */}
           <button className="btn rounded-full btn-primary text-white">
-          {isPending ? "Loading..." : "LogIn"}
+          {isPending ? <LoadingSpinner/> : "LogIn"}
           </button>
 
           {/* Error Message */}

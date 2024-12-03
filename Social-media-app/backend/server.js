@@ -1,8 +1,10 @@
 //import packages
+
 import express from "express"
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser"
 import cloudinary from "cloudinary"
+
 // import routes
 import authRoute from "./routes/auth.route.js"
 import userRoute from "./routes/user.route.js"
@@ -41,6 +43,7 @@ app.use(express.urlencoded({
 }))
 
 // routes path
+
 app.use("/api/auth", authRoute)
 app.use("/api/users", userRoute)
 app.use("/api/posts", postsRoute)
@@ -48,6 +51,7 @@ app.use("/api/notification",notificationRoute)
 
 
 // make local server
+
 app.listen(PORT,()=>{
 
     console.log(`server run ${PORT}`)

@@ -6,6 +6,7 @@ import { MdOutlineMail, MdPassword, MdDriveFileRenameOutline } from "react-icons
 import { FaUser } from "react-icons/fa";
 import { baseURL } from "../../constant/url";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ const SignUpPage = () => {
 
         const data = await res.json();
         if (!res.ok) {
-          throw new Error(data.error || "Something went wrong");
+          throw new Error(data.error || "Something went wrong"); 
         }
       } catch (error) {
         console.log(error);
@@ -39,7 +40,7 @@ const SignUpPage = () => {
       }
     },
     onSuccess: () => {
-      toast("user creted success")
+      toast.success("user creted success")
     },
   });
 
@@ -121,7 +122,7 @@ const SignUpPage = () => {
             className="btn rounded-full btn-primary text-white"
             disabled={isPending}
           >
-            {isPending ? "Loading..." : "Sign Up"}
+            {isPending ? <LoadingSpinner/> : "Sign Up"}
           </button>
           {isError && <p className="text-red-500">{error.message || "An error occurred"}</p>}
         </form>
