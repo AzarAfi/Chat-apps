@@ -9,6 +9,7 @@ import {Toaster} from "react-hot-toast"
 import { useQuery } from "@tanstack/react-query";
 import { baseURL } from "./constant/url.js";
 import LoadingSpinner from "../src/components/common/LoadingSpinner.jsx";
+
 function App() {
   const { data:authUser,isLoading } = useQuery({
     queryKey:["authUser"],
@@ -58,17 +59,17 @@ console.log(authUser)
   return (
     <div className="flex max-w-10xl mx-auto">
  
-    <Sidebar/>
-      {/* Routes */}
+        {authUser&&<Sidebar/>}
 
+      {/* Routes */}
       <Routes>
         <Route path="/" element={authUser?<HomePage />:<Navigate to="/login"/>} />
         <Route path="/signup" element={!authUser?<SignUpPage />:<Navigate to="/"/>} />
         <Route path="/login" element={!authUser?<LogInPage />:<Navigate to="/"/>} />
-        <Route path="/notification" element={authUser?<NotificationPage/>:<Navigate to="/login"/>} />
-
+        <Route path="/notification" element={authUser?<NotificationPage/>:<Navigate to="/login"/>}/>
+        {/* <Route path="/profile:username" element={authUser&&<ProfilePage/>}/> */}
       </Routes>
-         {authUser?<RightPanel/>:<Navigate to="/login"/>}
+         {authUser&&<RightPanel/>}
     <Toaster/>
     </div>
   );

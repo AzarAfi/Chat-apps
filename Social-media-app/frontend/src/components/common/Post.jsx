@@ -5,21 +5,68 @@ import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { baseURL } from "../../constant/url";
+import toast from "react-hot-toast";
+import LoadingSpinner from "./LoadingSpinner";
+
 
 
 
 const Post = ({ post }) => {
+
 	const [comment, setComment] = useState("");
+	const {data:authUser}= useQuery({
+		queryKey:["authUser"]
+	})
+
+	const queryClient = useQueryClient()
 	
+	const {mutate:deletePost,isPending:isDeleting}=useMutation({
+		mutationFn:async ()=>{
+			try {
+				const res= await fetch(`${baseURL}/api/posts/${post._id}`,
+					{
+						method:"DELETE",
+						credentials:"include",
+						headers:{
+							
+								"Content-Type": "application/json",
+						}
+					})
+					const data = await res.json()
+					if (!res.ok) {
+						throw new Error(data.error || "Something went wrong"); 
+					  }
+					  return data;
+					  
+
+			} catch (error) {
+				console.log(error);
+                throw error;
+			}
+		},
+		onSuccess : ()=>{
+			toast.success("Post delete successfully")
+			queryClient.invalidateQueries({
+				queryKey:["posts"]
+			})
+		}
+	})
 	const postOwner = post.user;
 	const isLiked = false;
-
-	const isMyPost = true;
+   
+	const isMyPost =authUser._id === post.user._id; // it will change true so user only delete posts
+	
 	const formattedDate = "1h";
 
      const isCommenting =false;
+
 	const handleDeletePost = () => {
 		
+		deletePost();
+
 	};
 
 	const handlePostComment = (e) => {
@@ -44,28 +91,36 @@ const Post = ({ post }) => {
 						<Link to={`/profile/${postOwner.username}`} className='font-bold'>
 							{postOwner.fullName}
 						</Link>
-						<span className='text-gray-700 flex gap-1 text-sm'>
+						<span className='text-yellow-300 flex gap-1 text-sm'>
 							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
 							<span>·</span>
 							<span>{formattedDate}</span>
 						</span>
+
+						{/* Delete post function */}
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>
-								
-									<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
-								
+								{!isDeleting &&
 
+                                    (<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />)
+								}
+								{isDeleting &&
+
+                                   (<LoadingSpinner size="sm"/>)
+                                  }
+		
 							</span>
 						)}
+
 					</div>
 					<div className='flex flex-col gap-3 overflow-hidden'>
 						<span>{post.text}</span>
+
 						{post.img && (
 							<img
 								src={post.img}
 								className='h-80 object-contain rounded-lg border border-gray-700'
-								alt=''
-							/>
+								alt='' />
 						)}
 					</div>
 					<div className='flex justify-between mt-3'>

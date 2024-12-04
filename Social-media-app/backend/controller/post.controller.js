@@ -4,86 +4,61 @@ import Post from "../models/post.model.js";
 import Notification from "../models/notification.model.js"
 
 export const createPost = async (req, res) => {
-    try {
-        const { text } = req.body;
-        let { img } = req.body;
-        const userId = req.user._id.toString();
+	try {
+		const { text } = req.body;
+		let { img } = req.body;
+		const userId = req.user._id.toString();
 
-        const user = await User.findOne({ _id: userId });
-        if (!user) {
-            return res.status(404).json({ error: "User not found" }); 
-        }
+		const user = await User.findById(userId);
+		if (!user) return res.status(404).json({ message: "User not found" });
 
-        
-        if (!img && !text) {
-            return res.status(400).json({ error: "Either image or text must be provided" }); // Clarified message
-        }
+		if (!text && !img) {
+			return res.status(400).json({ error: "Post must have text or image" });
+		}
 
+		if (img) {
+			const uploadedResponse = await cloudinary.uploader.upload(img);
+			img = uploadedResponse.secure_url;
+		}
 
+		const newPost = new Post({
+			user: userId,
+			text,
+			img,
+		});
 
-        if (img)
-            {
-            try {
-                const uploadedResponse = await cloudinary.uploader.upload(img);
-                img = uploadedResponse.secure_url; // Get the URL of the uploaded image
-            } catch (error) {
-                return res.status(500).json({ error: "Image upload failed" }); // Handle Cloudinary errors specifically
-            }
-        }
-
-        // Create the new post
-        const newPost = new Post({
-
-                            user: userId,
-                            text,
-                            img,
-        });
-
-        // Save the post to the database
-        await newPost.save();
-
-        // Respond with the newly created post
-        return res.status(201).json(newPost);
-
-    } catch (error) {
-        console.error(`The create post error: ${error}`);
-        return res.status(500).json({ error: "Internal server error" });
-    }
+		await newPost.save();
+		res.status(201).json(newPost);
+	} catch (error) {
+		res.status(500).json({ error: "Internal server error" });
+		console.log("Error in createPost controller: ", error);
+	}
 };
 
             /* delete post  */
 
-        export const deletePost = async (req, res) => {
+            export const deletePost = async (req, res) => {
                 try {
-                    const { id } = req.params;
-            
-                    // Find the post by its ID
-                    const post = await User.findById(id);
-            
+                    const post = await Post.findById(req.params.id);
                     if (!post) {
-                        return res.status(404).json({ error: "Post not found" }); // Corrected to Post not found
+                        return res.status(404).json({ error: "Post not found" });
                     }
             
-                    // Check if the current user is authorized to delete the post
                     if (post.user.toString() !== req.user._id.toString()) {
-                        return res.status(403).json({ error: "You are not authorized to delete this post" }); // 403 for forbidden action
+                        return res.status(401).json({ error: "You are not authorized to delete this post" });
                     }
             
-                    // Delete image from Cloudinary if it exists
                     if (post.img) {
                         const imgId = post.img.split("/").pop().split(".")[0];
-                        await cloudinary.uploader.destroy(imgId); // Destroy the image from Cloudinary
+                        await cloudinary.uploader.destroy(imgId);
                     }
             
-                    // Delete the post from the database
-                    await post.deleteOne({ _id: id });
+                    await Post.findByIdAndDelete(req.params.id);
             
-                    // Respond with a success message
-                    return res.status(200).json({ message: "Post deleted successfully" }); // Corrected to 200 OK
-            
+                    res.status(200).json({ message: "Post deleted successfully" });
                 } catch (error) {
-                    console.error(`The delete post error: ${error}`);
-                    return res.status(500).json({ error: "Internal server error" });
+                    console.log("Error in deletePost controller: ", error);
+                    res.status(500).json({ error: "Internal server error" });
                 }
             };
         
@@ -109,7 +84,7 @@ export const createPost = async (req, res) => {
                     const comments = { user: userId, text };
             
                     post.comments.push(comments);
-                    await post.save();
+                    await post.save(); 
             
                     res.status(200).json(post);
                 } catch (error) {
