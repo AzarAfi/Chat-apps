@@ -4,16 +4,16 @@ import { Link, useParams } from "react-router-dom";
 
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
-import EditProfileModal from "./EditProfileModal";
 
-import { POSTS } from "../../utils/db/Dummy";
+
+import { POSTS } from "../../utils/db/Dummy.js";
 
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
-import { formatMemberSinceDate } from "../../utils/date";
+import { formatMemberSinceDate } from "../../utils/db/date/Index.js";
 
 import useFollow from "../../hooks/useFollow";
 import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
