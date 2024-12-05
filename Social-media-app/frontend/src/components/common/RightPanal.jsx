@@ -44,7 +44,7 @@ const RightPanel = () => {
 			<div className="md:w-64 w-0"></div>
 		)
 			
-	}
+	} 
 
 	return (
 		<div className='hidden lg:block my-4 mx-2'>
