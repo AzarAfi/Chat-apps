@@ -10,6 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { baseURL } from "../../constant/url";
 import toast from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner";
+import { formatPostDate } from "../../utils/db/data/Index.js";
 
 
 
@@ -85,9 +86,10 @@ const Post = ({ post }) => {
 			// Show success toast to the user
 			
 			toast.success("Post liked successfully");
+			queryClient.invalidateQueries({queryKey:["posts"]})
 
 			// Update local cache without refetching data from the server
-			queryClient.setQueryData(["posts"], (oldData) => {
+			/* queryClient.setQueryData(["posts"], (oldData) => {
 				
 				
 				
@@ -99,7 +101,7 @@ const Post = ({ post }) => {
 					}
 					return pagePost; // If post id doesn't match, return it unchanged
 				});
-			});
+			}); */
 		}
 		
 	})
@@ -144,7 +146,7 @@ const Post = ({ post }) => {
    
 	const isMyPost =authUser._id === post.user._id; // it will change true so user only delete posts
 	
-	const formattedDate = "1h";
+	const formattedDate = formatPostDate(post.createdAt);
 
      
 
@@ -308,4 +310,4 @@ const Post = ({ post }) => {
 		</>
 	);
 };
-export default Post;
+export default Post; 

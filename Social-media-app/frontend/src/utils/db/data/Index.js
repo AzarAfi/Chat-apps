@@ -16,7 +16,7 @@ export const formatPostDate = (createdAt) => {
 		return `${timeDifferenceInHours}h`;
 	} else if (timeDifferenceInMinutes >= 1) {
 		return `${timeDifferenceInMinutes}m`;
-	} else {
+	} else { 
 		return "Just now";
 	}
 };

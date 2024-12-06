@@ -1,17 +1,10 @@
 
 import { useEffect, useState } from "react";
 import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const EditProfileModal = ({ authUser }) => {
-	const [formData, setFormData] = useState({
-		fullName: "",
-		username: "",
-		email: "",
-		bio: "",
-		link: "",
-		newPassword: "",
-		currentPassword: "",
-	});
+	const [formData, setFormData] = useState("");
 
 	const { updateProfile, isUpdatingProfile } = useUpdateUserProfile();
 
@@ -22,7 +15,7 @@ const EditProfileModal = ({ authUser }) => {
 	useEffect(() => {
 		if (authUser) {
 			setFormData({
-				fullName: authUser.fullName,
+				fullname: authUser.fullname,
 				username: authUser.username,
 				email: authUser.email,
 				bio: authUser.bio,
@@ -56,8 +49,8 @@ const EditProfileModal = ({ authUser }) => {
 								type='text'
 								placeholder='Full Name'
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
-								value={formData.fullName}
-								name='fullName'
+								value={formData.fullname}
+								name='fullname'
 								onChange={handleInputChange}
 							/>
 							<input
@@ -113,7 +106,7 @@ const EditProfileModal = ({ authUser }) => {
 							onChange={handleInputChange}
 						/>
 						<button className='btn btn-primary rounded-full btn-sm text-white'>
-							{isUpdatingProfile ? "Updating..." : "Update"}
+							{isUpdatingProfile ? <LoadingSpinner/> : "Update"}
 						</button>
 					</form>
 				</div>

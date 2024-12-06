@@ -143,7 +143,7 @@
                     }
             
                     // Handle profile and cover images (Cloudinary upload logic)
-                    /* Uncomment if image upload is needed
+                     /* Uncomment if image upload is needed */
                     if (profileImg) {
                         if (user.profileImg) {
                             await cloudinary.uploader.destroy(user.profileImg.split("/").pop().split(".")[0]);
@@ -159,7 +159,7 @@
                         const uploadedResponse = await cloudinary.uploader.upload(coverImg);
                         coverImg = uploadedResponse.secure_url;
                     }
-                    */
+                    
             
                     // Update user fields if new values are provided
                     user.fullname = fullname || user.fullname;

@@ -3,27 +3,74 @@ import { Link } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
+import{ useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
+import { baseURL } from "../../constant/url";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const NotificationPage = () => {
-	const isLoading = false;
-const notification = [{ _id: "1",
-    from:{
-        _id:"1",
-        username:"azarafi",
-        profileImg:"/avatars/boy2.png"
-    },
-    type:"follow"
-},
-{ _id: "2",
-    from:{
-        _id:"2",
-        username:"afrin",
-        profileImg:"/avatars/girl1.png"
-    },
-    type:"like"
-}]
+
+	
+      const queryClient = useQueryClient()
+	const {data:notification,isPending} = useQuery({
+		queryKey:["notification"],
+		queryFn:async() =>{
+			try {
+				const res = await fetch(`${baseURL}/api/notification/getnotification`,{
+					method:"GET",
+					credentials:"include",
+					headers:{
+						"Content-Type": "application/json",
+					}
+				})
+				const data = await res.json()
+				return data;
+				if(!res.ok){
+					throw new Error(data.error || "Something went wrong");
+				}
+			} catch (error) {
+				throw error
+			}
+		},
+		onSuccess : ()=>{
+			toast.success("notification add success")
+			queryClient.invalidateQueries({
+				queryKey:["notification"]
+			})
+		}
+		
+		
+	})
+	const {mutate:delete_Notifications} = useMutation({
+
+		mutationFn:async()=>{
+			try {
+				const res = await fetch(`${baseURL}/api/notification/deletenotification`,{
+					method:"DELETE",
+					credentials:"include",
+					headers:{
+						"Content-Type": "application/json",
+					}
+				})
+				const data = await res.json()
+				if(!res.ok){
+					throw new Error(data.error || "Something went wrong");
+				}
+				
+			} catch (error) {
+				throw error
+			}
+		},
+		onSuccess:()=>{
+			toast.success("natification delete successfully")
+			queryClient.invalidateQueries({
+				queryKey:["notification"]
+			})
+		}
+	})
+ 
 const deleteNotifications = () =>{
-    alert("all notificatrion delete success")
+   delete_Notifications()
 }
 	return (
 		<>
@@ -44,7 +91,7 @@ const deleteNotifications = () =>{
 						</ul>
 					</div>
 				</div>
-				{isLoading && (
+				{isPending && (
 					<div className='flex justify-center h-full items-center'>
 						<LoadingSpinner size='lg' />
 					</div>
