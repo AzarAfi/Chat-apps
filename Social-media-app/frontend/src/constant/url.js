@@ -1,1 +1,1 @@
-export const baseURL="http://localhost:1411"
+export const baseURL="https://chat-app-socialmedia.onrender.com"
